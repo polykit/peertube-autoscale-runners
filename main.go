@@ -28,7 +28,7 @@ var sqlJobs = `SELECT count(id) FROM "runnerJob" WHERE state=$1`
 var sqlIdle = `SELECT name FROM "runner" WHERE id NOT IN (
 	SELECT DISTINCT(r.id) FROM "runner" r 
 		LEFT JOIN "runnerJob" j ON r.id = j."runnerId" WHERE j.state = 2 OR j.state = 9
-		ORDER BY r.id) AND name LIKE '` + runnerPrefix + `%' LIMIT 1`
+		ORDER BY r.id) AND name LIKE $1 || '%' LIMIT 1`
 
 func main() {
 	flag.IntVar(&port, "port", 5432, "Database port")
@@ -190,7 +190,8 @@ func reconcile() error {
 	// scale down idle runners (one at a time)
 	if runners > minRunners && pending+waiting < minPending {
 		var name string
-		runnerIdle := db.QueryRow(sqlIdle)
+
+		runnerIdle := db.QueryRow(sqlIdle, runnerPrefix)
 		if err := runnerIdle.Scan(&name); err == sql.ErrNoRows {
 			return nil
 		} else if err != nil {

@@ -1,7 +1,7 @@
 TARGET = peertube-autoscale-runners
 GOTARGET = github.com/polykit/$(TARGET)
 REGISTRY ?= ghcr.io/polykit
-VERSION ?= 0.1.0
+VERSION ?= 0.1.1
 IMAGE = $(REGISTRY)/$(BIN)
 DOCKER ?= podman
 
